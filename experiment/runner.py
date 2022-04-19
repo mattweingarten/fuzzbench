@@ -502,9 +502,10 @@ def experiment_main():
         fuzz_target_name = environment.get('FUZZ_TARGET')
         experiment_filestore_path = experiment_utils.get_experiment_filestore_path()
         base_destination = os.path.join(experiment_filestore_path, 'input')
-        target_binary = fuzzer_utils.get_fuzz_target_binary(FUZZ_TARGET_DIR,
-                                                        fuzz_target_name)
+        target_binary = fuzzer_utils.get_fuzz_target_binary(FUZZ_TARGET_DIR,fuzz_target_name)
         filestore_utils.cp(target_binary, base_destination + '/', parallel=True)
+        new_binary_name = str(environment.get('FUZZER')) + str(environment.get('BENCHMARK'))
+        os.rename(base_destination + '/' + fuzz_target_name, base_destination + '/' + new_binary_name)
     except:
         logs.error('Didnt work :(')
 
