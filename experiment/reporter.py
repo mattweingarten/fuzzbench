@@ -44,7 +44,7 @@ def get_core_fuzzers():
 
 def output_report(experiment_config: dict,
                   in_progress=False,
-                  coverage_report=False):
+                  coverage_report=True):
     """Generate the HTML report and write it to |web_bucket|."""
     experiment_name = experiment_utils.get_experiment_name()
     reports_dir = get_reports_dir()
