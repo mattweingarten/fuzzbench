@@ -79,6 +79,12 @@ def build_benchmark(env=None):
     fuzzer = os.getenv('FUZZER')
     print('Building benchmark {benchmark} with fuzzer {fuzzer}'.format(
         benchmark=benchmark, fuzzer=fuzzer))
+
+    print("build_script", build_script)
+    print("environment variables")
+    for key, value in env.items():
+        print(key, value)
+
     subprocess.check_call(['/bin/bash', '-ex', build_script], env=env)
 
 
