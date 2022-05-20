@@ -62,7 +62,7 @@ def post_process_wllvm():
     print('AST_NAME', os.environ['AST_NAME'])
     print('AST_OPT_FLAGS', os.environ['AST_OPT_FLAGS'])
 
-    script = os.path.join(os.environ['llvm_opt_wrapper'], 'post_process')
+    script = os.path.join(os.environ['OUT'], 'post_process')
     subprocess.check_call(['/bin/bash', '-ex', script], env=os.environ)
 pass
 
