@@ -19,7 +19,7 @@ FROM $parent_image
 RUN apt-get update && \
     apt-get install -y wget libstdc++-5-dev libtool-bin automake flex bison \
                        libpixman-1-dev python3-setuptools unzip \
-                       apt-utils apt-transport-https ca-certificates
+                       apt-utils apt-transport-https ca-certificates ninja
 
 RUN apt-get install -y libglib2.0-dev python-pip
 
@@ -27,6 +27,12 @@ RUN apt-get install -y libglib2.0-dev python-pip
 RUN git clone https://github.com/mattweingarten/AFLplusplus /afl && \
     cd /afl && \
     git checkout stable-ast-modified
+
+
+#build llvm for llvm-link
+# RUN git clone https://github.com/llvm/llvm-project.git /llvm && \
+#     cd /llvm && cmake -S llvm -B build -G ninja
+
 
 # Build without Python support as we don't need it.
 # Set AFL_NO_X86 to skip flaky tests.
@@ -38,5 +44,5 @@ RUN cd /afl && unset CFLAGS && unset CXXFLAGS && \
 
 
 # wllvm
-RUN pip3 install --upgrade pip
+# RUN pip3 install --upgrade pip
 RUN pip3 install wllvm

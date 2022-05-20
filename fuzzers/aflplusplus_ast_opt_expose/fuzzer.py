@@ -48,6 +48,7 @@ def configure_wllvm():
     os.environ['CXX'] = 'wllvm++'
 
     shutil.copy('/afl/utils/llvm_opt_wrapper/post_process', build_directory)
+    shutil.copy('/afl/utils/llvm_opt_wrapper/llvm-link', '/usr/local/bin')
 
 
 def post_process_wllvm():
