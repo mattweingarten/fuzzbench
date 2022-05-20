@@ -27,7 +27,7 @@ def build():
     os.environ['CC'] = '/honggfuzz/hfuzz_cc/hfuzz-clang'
     os.environ['CXX'] = '/honggfuzz/hfuzz_cc/hfuzz-clang++'
     os.environ['FUZZER_LIB'] = '/honggfuzz/empty_lib.o'
-
+    print("We are building rigth now")
     utils.build_benchmark()
 
     print('[post_build] Copying honggfuzz to $OUT directory')
@@ -37,12 +37,21 @@ def build():
 
 def fuzz(input_corpus, output_corpus, target_binary):
     """Run fuzzer."""
+    print("We are running right now")
     # Seperate out corpus and crash directories as sub-directories of
     # |output_corpus| to avoid conflicts when corpus directory is reloaded.
     crashes_dir = os.path.join(output_corpus, 'crashes')
     output_corpus = os.path.join(output_corpus, 'corpus')
     os.makedirs(crashes_dir)
     os.makedirs(output_corpus)
+    
+
+    src = "/src/fuzzers/honggfuzz/seed"
+    src_files = os.listdir(src)
+    for file_name in src_files:
+        full_file_name = os.path.join(src, file_name)
+        if os.path.isfile(full_file_name):
+            shutil.copy(full_file_name, input_corpus)
 
     print('[fuzz] Running target with honggfuzz')
     command = [
