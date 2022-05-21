@@ -22,6 +22,10 @@ RUN apt-get update && \
                        apt-utils apt-transport-https ca-certificates ninja
 
 RUN apt-get install -y libglib2.0-dev python-pip
+RUN pip3 install wllvm
+
+ENV LLVM_COMPILER=clang
+
 
 # Download and compile afl++.
 RUN git clone https://github.com/mattweingarten/AFLplusplus /afl && \
@@ -42,7 +46,9 @@ RUN cd /afl && unset CFLAGS && unset CXXFLAGS && \
     make -C utils/aflpp_driver && \
     cp utils/aflpp_driver/libAFLDriver.a /
 
-
+RUN wget https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz -O /llvm.tar.xz
+RUN tar -xf /llvm.tar.xz
+RUN cp /afl/utils/llvm_opt_wrapper/post_process /out/
+# RUN
 # wllvm
 # RUN pip3 install --upgrade pip
-RUN pip3 install wllvm
