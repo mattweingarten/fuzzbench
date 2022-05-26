@@ -11,12 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Integration code for clang source-based coverage builds."""
 
-ARG parent_image
-FROM $parent_image
+import os
 
-ADD StandaloneFuzzTargetMainDirectory.c /
-RUN clang -g -O2 -fno-omit-frame-pointer /StandaloneFuzzTargetMainDirectory.c -fPIC -c -o /libFuzzer.a
-RUN cp /libFuzzer.a /usr/lib
+from fuzzers import utils
 
 
+def build():
+    """Build benchmark."""
+    cflags = [
+        '-fprofile-instr-generate', '-fcoverage-mapping', '-gline-tables-only'
+    ]
+    utils.append_flags('CFLAGS', cflags)
+    utils.append_flags('CXXFLAGS', cflags)
+
+    os.environ['CC'] = 'clang'
+    os.environ['CXX'] = 'clang++'
+    os.environ['FUZZER_LIB'] = '/usr/lib/libFuzzer.a'
+
+    utils.build_benchmark()
