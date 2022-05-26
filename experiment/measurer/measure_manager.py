@@ -47,6 +47,7 @@ from experiment.measurer import coverage_utils
 from experiment.measurer import run_coverage
 from experiment.measurer import run_crashes
 from experiment import scheduler
+from experiment.measurer.run_coverage import get_coverage_sancov
 
 logger = logs.Logger('measurer')  # pylint: disable=invalid-name
 
@@ -401,6 +402,12 @@ class SnapshotMeasurer(coverage_utils.TrialCoverage):  # pylint: disable=too-man
             filesystem.recreate_directory(directory)
         filesystem.create_directory(self.report_dir)
 
+    def run_cov_new_units_sancov(self):
+        coverage_binary = coverage_utils.get_coverage_binary(self.benchmark)
+        cov = run_coverage.get_coverage_sancov(coverage_binary,
+                                                      self.corpus_dir)
+        return cov
+
     def run_cov_new_units(self):
         """Run the coverage binary on new units."""
         coverage_binary = coverage_utils.get_coverage_binary(self.benchmark)
@@ -440,6 +447,9 @@ class SnapshotMeasurer(coverage_utils.TrialCoverage):  # pylint: disable=too-man
             summary_data = coverage_data["totals"]
             regions_coverage_data = summary_data["regions"]
             regions_covered = regions_coverage_data["covered"]
+
+            # TODO/BEAN: Can we somehow replace regions_covered with edge coverage and use everythin as is?
+
             return regions_covered
         except Exception:  # pylint: disable=broad-except
             self.logger.error(
@@ -657,15 +667,15 @@ def measure_snapshot_coverage(  # pylint: disable=too-many-locals
     measuring_start_time = time.time()
     snapshot_logger.info('Measuring cycle: %d.', cycle)
     this_time = experiment_utils.get_cycle_time(cycle)
-    if snapshot_measurer.is_cycle_unchanged(cycle):
-        snapshot_logger.info('Cycle: %d is unchanged.', cycle)
-        regions_covered = snapshot_measurer.get_current_coverage()
-        fuzzer_stats_data = snapshot_measurer.get_fuzzer_stats(cycle)
-        return models.Snapshot(time=this_time,
-                               trial_id=trial_num,
-                               edges_covered=regions_covered,
-                               fuzzer_stats=fuzzer_stats_data,
-                               crashes=[])
+    # if snapshot_measurer.is_cycle_unchanged(cycle):
+    #     snapshot_logger.info('Cycle: %d is unchanged.', cycle)
+    #     regions_covered = snapshot_measurer.get_current_coverage()
+    #     fuzzer_stats_data = snapshot_measurer.get_fuzzer_stats(cycle)
+    #     return models.Snapshot(time=this_time,
+    #                            trial_id=trial_num,
+    #                            edges_covered=regions_covered,
+    #                            fuzzer_stats=fuzzer_stats_data,
+    #                            crashes=[])
 
     corpus_archive_dst = os.path.join(
         snapshot_measurer.trial_dir, 'corpus',
@@ -696,12 +706,16 @@ def measure_snapshot_coverage(  # pylint: disable=too-many-locals
     # Run crashes again, parse stacktraces and generate crash signatures.
     crashes = snapshot_measurer.process_crashes(cycle)
 
+    # AST edge coverage
+    edges_covered = snapshot_measurer.run_cov_new_units_sancov()
+
     # Get the coverage of the new corpus units.
-    regions_covered = snapshot_measurer.get_current_coverage()
+    # regions_covered = snapshot_measurer.get_current_coverage()
+
     fuzzer_stats_data = snapshot_measurer.get_fuzzer_stats(cycle)
     snapshot = models.Snapshot(time=this_time,
                                trial_id=trial_num,
-                               edges_covered=regions_covered,
+                               edges_covered=edges_covered,
                                fuzzer_stats=fuzzer_stats_data,
                                crashes=crashes)
 

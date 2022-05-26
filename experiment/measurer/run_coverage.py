@@ -23,7 +23,11 @@ from common import logs
 from common import new_process
 from common import sanitizer
 import os
+from os import listdir
+from os.path import isfile, join
+
 logger = logs.Logger('run_coverage')
+
 
 # Time buffer for libfuzzer merge to gracefully exit.
 EXIT_BUFFER = 15
@@ -47,6 +51,11 @@ def find_crashing_units(artifacts_dir: str) -> List[str]:
         for filename in os.listdir(artifacts_dir)
         if os.path.isfile(os.path.join(artifacts_dir, filename))
     ]
+
+
+def list_files(dir):
+    files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
+    return files
 
 
 def get_coverage_sancov(coverage_binary, new_units_dir):
@@ -155,8 +164,8 @@ def do_coverage_run(  # pylint: disable=too-many-locals
 
 if __name__ == '__main__':
     coverage_binary = '/home/b/bdata-unsync/ast-fuzz/experiment-data/exp-2022-05-26-19-31-33/coverage-binaries/ftfuzzer'
-    new_units_dir = "/home/b/bdata-unsync/ast-fuzz/experiment-data/used/exp-2022-04-21-23-01-44-freetype2-2017-1h/experiment-folders/freetype2-2017-aflplusplus_ast_o0/trial-64/corpus/corpus/default/queue/id:005510,src:005399,time:3597806,execs:11272303,op:havoc,rep:8"
-    # new_units_dir = '/home/b/bdata-unsync/ast-fuzz/experiment-data/used/exp-2022-04-21-23-01-44-freetype2-2017-1h/experiment-folders/freetype2-2017-aflplusplus_ast_o0/trial-64/corpus/corpus/default/queue/'
+    # new_units_dir = "/home/b/bdata-unsync/ast-fuzz/experiment-data/used/exp-2022-04-21-23-01-44-freetype2-2017-1h/experiment-folders/freetype2-2017-aflplusplus_ast_o0/trial-64/corpus/corpus/default/queue/"
+    new_units_dir = '/home/b/bdata-unsync/ast-fuzz/experiment-data/used/exp-2022-04-21-23-01-44-freetype2-2017-1h/experiment-folders/freetype2-2017-aflplusplus_ast_o0/trial-64/corpus/corpus/default/queue/'
 
     cov = get_coverage_sancov(coverage_binary, new_units_dir)
     print(cov)

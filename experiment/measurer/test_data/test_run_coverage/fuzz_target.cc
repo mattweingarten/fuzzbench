@@ -19,6 +19,20 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
+
+
+static void f(const uint8_t* data, size_t size) {
+  if (size > 3) {
+      if (data[0] == 'c') {
+      if (data[1] == 'h') {
+      if (data[2] == 'n') {
+      printf("reached chn\n");
+      }
+      }
+      }
+  }
+}
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   if (size < 0)
@@ -26,6 +40,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
   if (data[0] == 'a')
     abort();
+
+   f(data, size);
+
   if (size < 4)
     return 0;
   if (data[0] == 't' && data[1] == 'i' && data[2] == 'm' && data[3] == 'e')
