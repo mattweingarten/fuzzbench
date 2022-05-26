@@ -163,9 +163,7 @@ def do_coverage_run(  # pylint: disable=too-many-locals
 
 
 if __name__ == '__main__':
-    coverage_binary = '/home/b/bdata-unsync/ast-fuzz/experiment-data/exp-2022-05-26-19-31-33/coverage-binaries/ftfuzzer'
-    # new_units_dir = "/home/b/bdata-unsync/ast-fuzz/experiment-data/used/exp-2022-04-21-23-01-44-freetype2-2017-1h/experiment-folders/freetype2-2017-aflplusplus_ast_o0/trial-64/corpus/corpus/default/queue/"
-    new_units_dir = '/home/b/bdata-unsync/ast-fuzz/experiment-data/used/exp-2022-04-21-23-01-44-freetype2-2017-1h/experiment-folders/freetype2-2017-aflplusplus_ast_o0/trial-64/corpus/corpus/default/queue/'
-
+    coverage_binary = ''
+    new_units_dir = ''
     cov = get_coverage_sancov(coverage_binary, new_units_dir)
     print(cov)
