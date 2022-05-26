@@ -72,3 +72,4 @@ docker/generated.mk
 /experiment/measurer/test_data/test_run_coverage/fuzz-target2.o0.151271.sancov
 /experiment/measurer/test_data/test_run_coverage/fuzz-target2.o0.156974.sancov
 /experiment/measurer/test_data/test_run_coverage/fuzz-target2.o3
+/fuzzers/coverage/sancov

@@ -27,6 +27,9 @@ RUN apt-get update -y && apt-get install -y \
     libarchive13 \
     libgss3
 
+
+RUN apt-get install libgl1 -y
+
 # Install docker cli.
 RUN DOCKER_VERSION=18.09.7 && \
     curl -O https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VERSION.tgz && \
@@ -44,5 +47,7 @@ RUN chmod +x /usr/local/bin/cloud_sql_proxy
 COPY --from=base-clang /usr/local/bin/llvm-cov /usr/local/bin/
 COPY --from=base-clang /usr/local/bin/llvm-profdata /usr/local/bin/
 COPY --from=base-clang /usr/local/bin/llvm-symbolizer /usr/local/bin/
+COPY --from=base-clang /usr/local/bin/sancov /usr/local/bin/
+
 
 COPY startup-dispatcher.sh $WORK/

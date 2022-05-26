@@ -92,7 +92,6 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                                  'output': result.output[-new_process.LOG_LIMIT_FIELD:],
                              })
             else:
-
                 cov_file = None
                 for file in os.listdir(asan_outdir):
                     if file.endswith(".sancov"):
@@ -118,9 +117,8 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                                              timeout=MAX_TOTAL_TIME)
 
                 sancov_outfile.close()
-
-
                 edge_cov = sum(1 for line in open(sancov_outfile.name))
+                print(coverage_binary, 'covered', edge_cov)
     except Exception as e:
         print(e)
         pass
