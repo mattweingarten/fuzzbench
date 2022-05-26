@@ -448,8 +448,6 @@ class SnapshotMeasurer(coverage_utils.TrialCoverage):  # pylint: disable=too-man
             regions_coverage_data = summary_data["regions"]
             regions_covered = regions_coverage_data["covered"]
 
-            # TODO/BEAN: Can we somehow replace regions_covered with edge coverage and use everythin as is?
-
             return regions_covered
         except Exception:  # pylint: disable=broad-except
             self.logger.error(
