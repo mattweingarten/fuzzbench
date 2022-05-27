@@ -57,8 +57,8 @@ def list_files(dir):
     files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
     return files
 
-
 def get_coverage_sancov(coverage_binary, new_units_dir):
+    """ XXX:Bean, invoke sancov, extract edge regions covered"""
     edge_cov = 0
     try:
         with tempfile.TemporaryDirectory() as asan_outdir:
@@ -68,7 +68,6 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
             ]
             coverage_binary_dir = os.path.dirname(coverage_binary)
             env = os.environ.copy()
-            # sanitizer.set_sanitizer_options(env)
 
             data_dir = ":coverage_dir=" + asan_outdir
             if 'ASAN_OPTIONS' in env:
@@ -76,16 +75,14 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
             else:
                 env['ASAN_OPTIONS'] = 'coverage=1' + data_dir
 
-            print(command)
-            print(env)
             result = new_process.execute(command,
                                          env=env,
                                          cwd=coverage_binary_dir,
                                          expect_zero=False,
                                          kill_children=True,
                                          timeout=MAX_TOTAL_TIME)
+
             if result.retcode != 0:
-                print(result.output)
                 logger.error('Coverage run failed.',
                              extras={
                                  'coverage_binary': coverage_binary,
@@ -98,7 +95,6 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                         cov_file = os.path.join(asan_outdir, file)
                         break
 
-                print(cov_file)
                 command = [
                     'sancov',
                     '-print',
@@ -106,8 +102,7 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                 ]
                 sancov_outfile_name =  os.path.join(asan_outdir, 'sancov_out.txt')
                 sancov_outfile = open(sancov_outfile_name, "w")
-                print(sancov_outfile_name)
-                print(command)
+
                 result = new_process.execute(command,
                                              env=env,
                                              cwd=asan_outdir,
@@ -118,7 +113,7 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
 
                 sancov_outfile.close()
                 edge_cov = sum(1 for line in open(sancov_outfile.name))
-                print(coverage_binary, 'covered', edge_cov)
+                print(coverage_binary, 'covered edges: ', edge_cov, sancov_outfile_name, cov_file)
     except Exception as e:
         print(e)
         pass
@@ -162,6 +157,7 @@ def do_coverage_run(  # pylint: disable=too-many-locals
 
 if __name__ == '__main__':
     coverage_binary = ''
-    new_units_dir = ''
-    cov = get_coverage_sancov(coverage_binary, new_units_dir)
+    new_units_diro3 = ''
+    new_units_diro0 = ''
+    cov = get_coverage_sancov(coverage_binary, new_units_diro0)
     print(cov)

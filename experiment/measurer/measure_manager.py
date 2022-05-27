@@ -582,6 +582,7 @@ class SnapshotMeasurer(coverage_utils.TrialCoverage):  # pylint: disable=too-man
     def update_measured_files(self):
         """Updates the measured-files.txt file for this trial with
         files measured in this snapshot."""
+
         current_files = set(os.listdir(self.corpus_dir))
         already_measured = self.get_measured_files()
         filesystem.write(self.measured_files_path,
@@ -665,6 +666,9 @@ def measure_snapshot_coverage(  # pylint: disable=too-many-locals
     measuring_start_time = time.time()
     snapshot_logger.info('Measuring cycle: %d.', cycle)
     this_time = experiment_utils.get_cycle_time(cycle)
+
+    # XXX: Bean we always create data for snapshot even if cycle unchanged
+
     # if snapshot_measurer.is_cycle_unchanged(cycle):
     #     snapshot_logger.info('Cycle: %d is unchanged.', cycle)
     #     regions_covered = snapshot_measurer.get_current_coverage()
@@ -707,18 +711,24 @@ def measure_snapshot_coverage(  # pylint: disable=too-many-locals
     # AST edge coverage
     edges_covered = snapshot_measurer.run_cov_new_units_sancov()
 
-    # Get the coverage of the new corpus units.
-    # regions_covered = snapshot_measurer.get_current_coverage()
+    # Get the coverage of the new corpus units
+    # XXX: Bean We dont care about src based cov
+    regions_covered = snapshot_measurer.get_current_coverage()
 
     fuzzer_stats_data = snapshot_measurer.get_fuzzer_stats(cycle)
+
+    print("new snapshot", this_time, trial_num, edges_covered, fuzzer_stats_data, crashes)
+
     snapshot = models.Snapshot(time=this_time,
                                trial_id=trial_num,
                                edges_covered=edges_covered,
                                fuzzer_stats=fuzzer_stats_data,
                                crashes=crashes)
 
+    # XXX: Bean We always measure corpus again from new (bean)
+    # This is needed for sancov to work!
     # Record the new corpus files.
-    snapshot_measurer.update_measured_files()
+    # snapshot_measurer.update_measured_files()
 
     measuring_time = round(time.time() - measuring_start_time, 2)
     snapshot_logger.info('Measured cycle: %d in %f seconds.', cycle,

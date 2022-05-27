@@ -10,7 +10,7 @@
 extern int LLVMFuzzerTestOneInput(const unsigned char *data, size_t size);
 __attribute__((weak)) extern int LLVMFuzzerInitialize(int *argc, char ***argv);
 int main(int argc, char **argv) {
-  fprintf(stderr, "StandaloneFuzzTargetMain: running %d inputs\n", argc - 1);
+  fprintf(stderr, "StandaloneFuzzTargetMainDirectory: running %d inputs\n", argc - 1);
 
   if (LLVMFuzzerInitialize)
     LLVMFuzzerInitialize(&argc, &argv);
@@ -20,11 +20,13 @@ int main(int argc, char **argv) {
     struct dirent *dir;
     d = opendir(argv[1]);
     char p[1000];
+    int i = 0;
     if (d)
     {
         while ((dir = readdir(d)) != NULL)
         {
             if(dir->d_type==DT_REG){
+                i++;
                 p[0]='\0';
                 strcat(p, argv[1]);
                 strcat(p,"/");
@@ -48,5 +50,6 @@ int main(int argc, char **argv) {
         }
         closedir(d);
     }
+    fprintf(stderr, "Corpus had %d files\n", i);
   }
 }
