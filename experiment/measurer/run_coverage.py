@@ -63,6 +63,7 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
     edge_cov = 0
     try:
         with tempfile.TemporaryDirectory() as asan_outdir:
+            
             command = [
                 coverage_binary,
                 new_units_dir
@@ -113,14 +114,22 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                                              timeout=MAX_TOTAL_TIME)
 
 
-                #persist results of sancov
-                coverage_directory = os.path.dirname(coverage_binary)
-                shutil.copy(sancov_outfile.name,coverage_directory,False)
-
-
                 sancov_outfile.close()
                 edge_cov = sum(1 for line in open(sancov_outfile.name))
                 print(coverage_binary, 'covered edges: ', edge_cov, sancov_outfile_name, cov_file)
+
+                logger.info("Copy sancov report")
+                #persist results of sancov
+                logger = logs.Logger('coverage')
+                coverage_directory = os.path.dirname(coverage_binary)
+                logger.info("coverage binary path : " + coverage_directory )
+                logger.info("sancov file: " + sancov_outfile.name )                
+                print("coverage binary path : " + coverage_directory )
+                print("sancov file: " + sancov_outfile.name )
+                shutil.copy(sancov_outfile.name,coverage_directory,False)
+
+
+
     except Exception as e:
         print(e)
         pass
