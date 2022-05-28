@@ -60,6 +60,8 @@ def list_files(dir):
 def get_coverage_sancov(coverage_binary, new_units_dir):
     """ XXX:Bean, invoke sancov, extract edge regions covered"""
     edge_cov = 0
+    sancov_exe = os.path.dirname(os.path.realpath(__file__)) + '/files/sancov'
+
     try:
         with tempfile.TemporaryDirectory() as asan_outdir:
             command = [
@@ -75,6 +77,7 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
             else:
                 env['ASAN_OPTIONS'] = 'coverage=1' + data_dir
 
+            print(command)
             result = new_process.execute(command,
                                          env=env,
                                          cwd=coverage_binary_dir,
@@ -88,6 +91,12 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                                  'coverage_binary': coverage_binary,
                                  'output': result.output[-new_process.LOG_LIMIT_FIELD:],
                              })
+                print(result)
+                print(result.retcode)
+                print(result.output)
+                print(coverage_binary_dir)
+                print(MAX_TOTAL_TIME)
+
             else:
                 cov_file = None
                 for file in os.listdir(asan_outdir):
@@ -96,13 +105,15 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                         break
 
                 command = [
-                    'sancov',
+                    sancov_exe,
                     '-print',
                     cov_file
                 ]
+
                 sancov_outfile_name =  os.path.join(asan_outdir, 'sancov_out.txt')
                 sancov_outfile = open(sancov_outfile_name, "w")
 
+                print(command)
                 result = new_process.execute(command,
                                              env=env,
                                              cwd=asan_outdir,
@@ -156,8 +167,8 @@ def do_coverage_run(  # pylint: disable=too-many-locals
 
 
 if __name__ == '__main__':
-    coverage_binary = ''
+    coverage_binary = '/home/b/bdata-unsync/ast-fuzz/experiment-data/exp-2022-05-28-19-20-39/coverage-binaries/fuzz_htp'
     new_units_diro3 = ''
-    new_units_diro0 = ''
+    new_units_diro0 = '/home/b/bdata-unsync/ast-fuzz/experiment-data/exp-2022-05-28-19-20-39/experiment-folders/libhtp_fuzz_htp-aflplusplus_ast_f0/trial-359/corpus/corpus/default/queue/'
     cov = get_coverage_sancov(coverage_binary, new_units_diro0)
     print(cov)
