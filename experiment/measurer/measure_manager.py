@@ -710,6 +710,7 @@ def measure_snapshot_coverage(  # pylint: disable=too-many-locals
 
     # AST edge coverage
     edges_covered = snapshot_measurer.run_cov_new_units_sancov()
+    
 
     # Get the coverage of the new corpus units
     # XXX: Bean We dont care about src based cov

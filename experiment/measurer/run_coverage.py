@@ -15,6 +15,7 @@
 on a corpus."""
 
 import os
+import shutil
 import tempfile
 from typing import List
 
@@ -110,6 +111,12 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                                              kill_children=True,
                                              output_file=sancov_outfile,
                                              timeout=MAX_TOTAL_TIME)
+
+
+                #persist results of sancov
+                coverage_directory = os.path.dirname(coverage_binary)
+                shutil.copy(sancov_outfile.name,coverage_directory,False)
+
 
                 sancov_outfile.close()
                 edge_cov = sum(1 for line in open(sancov_outfile.name))
