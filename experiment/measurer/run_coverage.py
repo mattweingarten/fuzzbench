@@ -131,18 +131,9 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                 edge_cov = sum(1 for line in open(sancov_outfile.name))
                 print(coverage_binary, 'covered edges: ', edge_cov, sancov_outfile_name, cov_file)
 
-                logger.info("Copy sancov report")
-                #persist results of sancov
-                logger = logs.Logger('coverage')
                 experiment_filestore_path = experiment_utils.get_experiment_filestore_path()
-                destination = os.path.join('coverage/data/')
-                # coverage_directory = os.path.dirname(coverage_binary)
-                # logger.info("coverage binary path : " + coverage_directory )
-                logger.info("sancov file: " + sancov_outfile.name )                
-                # print("coverage binary path : " + coverage_directory )
-                print("sancov file: " + sancov_outfile.name )
-                filestore_utils.cp(sancov_outfile.name, destination + '/', parallel=True)
-
+                print(experiment_filestore_path, sancov_outfile.name  )
+                filestore_utils.cp(sancov_outfile.name, experiment_filestore_path + '/', parallel=True)
 
     except Exception as e:
         print(e)

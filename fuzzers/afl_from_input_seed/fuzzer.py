@@ -35,7 +35,9 @@ def fuzz(input_corpus, output_corpus, target_binary):
     """Run fuzzer."""
     run_options = []
 
-    aflplusplus_fuzzer.fuzz("/mnt/c/Users/Matt/Desktop/ASTtop/inputs/c1/",
+    #Copy starting seed to input corpus
+
+    aflplusplus_fuzzer.fuzz(input_corpus,
                             output_corpus,
                             target_binary,
                             flags=(run_options))
