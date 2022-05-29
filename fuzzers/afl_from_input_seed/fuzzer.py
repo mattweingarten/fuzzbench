@@ -23,7 +23,7 @@
 import os
 
 from fuzzers.aflplusplus import fuzzer as aflplusplus_fuzzer
-
+from common import filestore_utils
 def build():
     """Build benchmark."""
     os.environ['AFL_DONT_OPTIMIZE'] = '1'
@@ -36,6 +36,13 @@ def fuzz(input_corpus, output_corpus, target_binary):
     run_options = []
 
     #Copy starting seed to input corpus
+    print(input_corpus)
+    starting_seed_corpus = "/src/fuzzers/" + os.environ['FUZZER'] + '/' +  os.environ['BENCHMARK'] + '/' + 'corpus/'
+    print(starting_seed_corpus)
+    for f in os.listdir(starting_seed_corpus):
+        filestore_utils.cp(f, input_corpus, parallel=True)
+
+
 
     aflplusplus_fuzzer.fuzz(input_corpus,
                             output_corpus,
