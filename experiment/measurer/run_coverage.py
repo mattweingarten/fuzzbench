@@ -16,7 +16,6 @@ on a corpus."""
 
 import os
 from re import T
-import shutil
 import tempfile
 from typing import List
 
@@ -131,7 +130,7 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                 edge_cov = sum(1 for line in open(sancov_outfile.name))
                 print(coverage_binary, 'covered edges: ', edge_cov, sancov_outfile_name, cov_file)
 
-                experiment_filestore_path = experiment_utils.get_experiment_filestore_path()
+                experiment_filestore_path = experiment_utils.get_trial_dir()
                 print(experiment_filestore_path, sancov_outfile.name  )
                 filestore_utils.cp(sancov_outfile.name, experiment_filestore_path + '/', parallel=True)
 
@@ -178,7 +177,7 @@ def do_coverage_run(  # pylint: disable=too-many-locals
 
 if __name__ == '__main__':
     coverage_binary = '/home/b/bdata-unsync/ast-fuzz/experiment-data/exp-2022-05-28-19-20-39/coverage-binaries/fuzz_htp'
-    new_units_diro3 = ''
+    e = ''
     new_units_diro0 = '/home/b/bdata-unsync/ast-fuzz/experiment-data/exp-2022-05-28-19-20-39/experiment-folders/libhtp_fuzz_htp-aflplusplus_ast_f0/trial-359/corpus/corpus/default/queue/'
     cov = get_coverage_sancov(coverage_binary, new_units_diro0)
     print(cov)
