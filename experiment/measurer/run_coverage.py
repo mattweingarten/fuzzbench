@@ -15,6 +15,7 @@
 on a corpus."""
 
 import os
+from re import T
 import shutil
 import tempfile
 from typing import List
@@ -23,6 +24,7 @@ from common import experiment_utils
 from common import logs
 from common import new_process
 from common import sanitizer
+from common import filestore_utils
 import os
 from os import listdir
 from os.path import isfile, join
@@ -132,13 +134,14 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                 logger.info("Copy sancov report")
                 #persist results of sancov
                 logger = logs.Logger('coverage')
-                coverage_directory = os.path.dirname(coverage_binary)
-                logger.info("coverage binary path : " + coverage_directory )
+                experiment_filestore_path = experiment_utils.get_experiment_filestore_path()
+                destination = os.path.join('coverage/data/')
+                # coverage_directory = os.path.dirname(coverage_binary)
+                # logger.info("coverage binary path : " + coverage_directory )
                 logger.info("sancov file: " + sancov_outfile.name )                
-                print("coverage binary path : " + coverage_directory )
+                # print("coverage binary path : " + coverage_directory )
                 print("sancov file: " + sancov_outfile.name )
-                shutil.copy(sancov_outfile.name,coverage_directory,False)
-
+                filestore_utils.cp(sancov_outfile.name, destination + '/', parallel=True)
 
 
     except Exception as e:
