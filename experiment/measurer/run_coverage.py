@@ -59,7 +59,7 @@ def list_files(dir):
     files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
     return files
 
-def get_coverage_sancov(coverage_binary, new_units_dir):
+def get_coverage_sancov(coverage_binary, new_units_dir, trial_dir):
     """ XXX:Bean, invoke sancov, extract edge regions covered"""
     edge_cov = 0
     sancov_exe = os.path.dirname(os.path.realpath(__file__)) + '/files/sancov'
@@ -130,9 +130,8 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                 edge_cov = sum(1 for line in open(sancov_outfile.name))
                 print(coverage_binary, 'covered edges: ', edge_cov, sancov_outfile_name, cov_file)
 
-                experiment_filestore_path = experiment_utils.get_trial_dir()
-                print(experiment_filestore_path, sancov_outfile.name  )
-                filestore_utils.cp(sancov_outfile.name, experiment_filestore_path + '/', parallel=True)
+                print(trial_dir, sancov_outfile.name )
+                filestore_utils.cp(sancov_outfile.name, trial_dir + '/', parallel=True)
 
     except Exception as e:
         print(e)

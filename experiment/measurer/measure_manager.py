@@ -405,7 +405,7 @@ class SnapshotMeasurer(coverage_utils.TrialCoverage):  # pylint: disable=too-man
     def run_cov_new_units_sancov(self):
         coverage_binary = coverage_utils.get_coverage_binary(self.benchmark)
         cov = run_coverage.get_coverage_sancov(coverage_binary,
-                                                      self.corpus_dir)
+                                                      self.corpus_dir, self.trial_dir)
         return cov
 
     def run_cov_new_units(self):

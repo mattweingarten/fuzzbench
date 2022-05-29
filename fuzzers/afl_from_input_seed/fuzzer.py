@@ -43,11 +43,11 @@ def fuzz(input_corpus, output_corpus, target_binary):
     for f in os.listdir(starting_seed_corpus):
         os.system("tar -xzf " +  starting_seed_corpus + f +  " -C" + '/tmp/')
         for seed in os.listdir("/tmp/seeds"):
-            shutil.cp(seed, input_corpus)
+            shutil.copy("/tmp/seeds/" + seed, "/out/seeds/", follow_symlinks=False)
         # shutil.cp(f, input_corpus)
 
 
-    print(len([ f in os.listdir(input_corpus)]))
+    print("Len of seeds: " + len([ f in os.listdir("/out/seeds/")]))
     # for f in os.listdir()
 
 
