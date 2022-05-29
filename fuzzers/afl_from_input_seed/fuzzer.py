@@ -21,13 +21,14 @@
 # otherwise.
 
 import os
+import shutil
 
 from fuzzers.aflplusplus import fuzzer as aflplusplus_fuzzer
-from common import filestore_utils
+
 def build():
     """Build benchmark."""
     os.environ['AFL_DONT_OPTIMIZE'] = '1'
-    os.environ['AST_CC_ARGS'] = '-03'
+    os.environ['AST_CC_ARGS'] = '-O3'
     aflplusplus_fuzzer.build()
 
 
@@ -40,7 +41,7 @@ def fuzz(input_corpus, output_corpus, target_binary):
     starting_seed_corpus = "/src/fuzzers/" + os.environ['FUZZER'] + '/' +  os.environ['BENCHMARK'] + '/' + 'corpus/'
     print(starting_seed_corpus)
     for f in os.listdir(starting_seed_corpus):
-        filestore_utils.cp(f, input_corpus, parallel=True)
+        shutil.cp(f, input_corpus)
 
 
 
