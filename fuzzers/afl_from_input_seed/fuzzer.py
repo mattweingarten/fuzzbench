@@ -41,7 +41,9 @@ def fuzz(input_corpus, output_corpus, target_binary):
     starting_seed_corpus = "/src/fuzzers/" + os.environ['FUZZER'] + '/' +  os.environ['BENCHMARK'] + '/' + 'corpus/'
     print(starting_seed_corpus)
     for f in os.listdir(starting_seed_corpus):
-        os.system("tar -xzf " +  starting_seed_corpus + f +  " -C" + input_corpus)
+        os.system("tar -xzf " +  starting_seed_corpus + f +  " -C" + '/tmp/')
+        for seed in os.listdir("/tmp/seeds"):
+            shutil.cp(seed, input_corpus)
         # shutil.cp(f, input_corpus)
 
 
