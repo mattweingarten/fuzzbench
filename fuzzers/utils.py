@@ -242,6 +242,7 @@ def create_seed_file_for_empty_corpus(input_corpus):
     """Create a fake seed file in an empty corpus, skip otherwise."""
     if os.listdir(input_corpus):
         # Input corpus has some files, no need of a seed file. Bail out.
+        print("Bailing out!")
         print(os.listdir(input_corpus))
         return
 
