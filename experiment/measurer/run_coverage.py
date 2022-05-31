@@ -15,6 +15,7 @@
 on a corpus."""
 
 import os
+from re import T
 import tempfile
 from typing import List
 
@@ -22,6 +23,7 @@ from common import experiment_utils
 from common import logs
 from common import new_process
 from common import sanitizer
+from common import filestore_utils
 import os
 from os import listdir
 from os.path import isfile, join
@@ -57,13 +59,14 @@ def list_files(dir):
     files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
     return files
 
-def get_coverage_sancov(coverage_binary, new_units_dir):
+def get_coverage_sancov(coverage_binary, new_units_dir, trial_dir):
     """ XXX:Bean, invoke sancov, extract edge regions covered"""
     edge_cov = 0
     sancov_exe = os.path.dirname(os.path.realpath(__file__)) + '/files/sancov'
 
     try:
         with tempfile.TemporaryDirectory() as asan_outdir:
+            
             command = [
                 coverage_binary,
                 new_units_dir
@@ -122,9 +125,14 @@ def get_coverage_sancov(coverage_binary, new_units_dir):
                                              output_file=sancov_outfile,
                                              timeout=MAX_TOTAL_TIME)
 
+
                 sancov_outfile.close()
                 edge_cov = sum(1 for line in open(sancov_outfile.name))
                 print(coverage_binary, 'covered edges: ', edge_cov, sancov_outfile_name, cov_file)
+
+                print(trial_dir, sancov_outfile.name )
+                filestore_utils.cp(sancov_outfile.name, trial_dir + '/', parallel=True)
+
     except Exception as e:
         print(e)
         pass
@@ -168,7 +176,7 @@ def do_coverage_run(  # pylint: disable=too-many-locals
 
 if __name__ == '__main__':
     coverage_binary = '/home/b/bdata-unsync/ast-fuzz/experiment-data/exp-2022-05-28-19-20-39/coverage-binaries/fuzz_htp'
-    new_units_diro3 = ''
+    e = ''
     new_units_diro0 = '/home/b/bdata-unsync/ast-fuzz/experiment-data/exp-2022-05-28-19-20-39/experiment-folders/libhtp_fuzz_htp-aflplusplus_ast_f0/trial-359/corpus/corpus/default/queue/'
     cov = get_coverage_sancov(coverage_binary, new_units_diro0)
     print(cov)

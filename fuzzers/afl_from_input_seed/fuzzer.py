@@ -21,13 +21,14 @@
 # otherwise.
 
 import os
+import shutil
 
 from fuzzers.aflplusplus import fuzzer as aflplusplus_fuzzer
 
 def build():
     """Build benchmark."""
     os.environ['AFL_DONT_OPTIMIZE'] = '1'
-    os.environ['AST_CC_ARGS'] = '-03'
+    os.environ['AST_CC_ARGS'] = '-O3'
     aflplusplus_fuzzer.build()
 
 
@@ -35,7 +36,28 @@ def fuzz(input_corpus, output_corpus, target_binary):
     """Run fuzzer."""
     run_options = []
 
-    aflplusplus_fuzzer.fuzz("/mnt/c/Users/Matt/Desktop/ASTtop/inputs/c1/",
+    #Copy starting seed to input corpus
+    count = 0
+    print(input_corpus)
+    starting_seed_corpus = "/src/fuzzers/" + os.environ['FUZZER'] + '/' +  os.environ['BENCHMARK'] + '/' + 'corpus/'
+    print(starting_seed_corpus)
+    for f in os.listdir(starting_seed_corpus):
+        os.system("tar -xvf --overwrite " +  starting_seed_corpus + f +  " -C" + '/tmp/')
+        print(os.listdir("/tmp/seeds"))
+        for seed in os.listdir("/tmp/seeds"):
+            os.rename("/tmp/seeds/" + seed, "/tmp/seeds/" + str(count))
+            shutil.copy("/tmp/seeds/" + str(count), "/out/seeds/", follow_symlinks=False)
+            count += 1
+        print(os.listdir("/tmp/seeds"))
+
+
+    print("Len of seeds: " + str(len([ f in os.listdir("/out/seeds/")])))
+    print(count)
+    # for f in os.listdir()
+
+
+
+    aflplusplus_fuzzer.fuzz(input_corpus,
                             output_corpus,
                             target_binary,
                             flags=(run_options))
