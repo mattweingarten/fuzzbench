@@ -29,7 +29,7 @@ import subprocess
 def build():
     """Build benchmark."""
     os.environ['AFL_DONT_OPTIMIZE'] = '1'
-    os.environ['AST_CC_ARGS'] = '-O3'
+    os.environ['AST_CC_ARGS'] = '-O2'
     aflplusplus_fuzzer.build()
 
 
