@@ -22,8 +22,9 @@
 
 import os
 import shutil
-
+import time
 from fuzzers.aflplusplus import fuzzer as aflplusplus_fuzzer
+import subprocess
 
 def build():
     """Build benchmark."""
@@ -38,22 +39,56 @@ def fuzz(input_corpus, output_corpus, target_binary):
 
     #Copy starting seed to input corpus
     count = 0
-    print(input_corpus)
-    starting_seed_corpus = "/src/fuzzers/" + os.environ['FUZZER'] + '/' +  os.environ['BENCHMARK'] + '/' + 'corpus/'
+    # print(input_corpus)
+    starting_seed_corpus = "/src/fuzzers/" + os.environ['FUZZER'] + '/' +  os.environ['BENCHMARK'] + '/'
     print(starting_seed_corpus)
-    for f in os.listdir(starting_seed_corpus):
-        os.system("tar -xvf --overwrite " +  starting_seed_corpus + f +  " -C" + '/tmp/')
-        print(os.listdir("/tmp/seeds"))
-        for seed in os.listdir("/tmp/seeds"):
-            os.rename("/tmp/seeds/" + seed, "/tmp/seeds/" + str(count))
-            shutil.copy("/tmp/seeds/" + str(count), "/out/seeds/", follow_symlinks=False)
-            count += 1
-        print(os.listdir("/tmp/seeds"))
+    print(os.listdir(starting_seed_corpus))
 
 
-    print("Len of seeds: " + str(len([ f in os.listdir("/out/seeds/")])))
+    for c in os.scandir(starting_seed_corpus):
+        
+        command = [
+            "tar", 
+            "-xvf", 
+            c.path,
+            "-C", 
+            "/tmp/"
+        ]
+        p = subprocess.Popen(command)
+        p.wait()
+        print(os.listdir("/tmp/"))
+        print(os.listdir("/tmp/corpus/"))
+        print(os.listdir("/tmp/corpus/default/"))
+        print(os.listdir("/tmp/corpus/default/queue"))
+        for seed in os.scandir("/tmp/corpus/default/queue/"):
+            if not seed.is_dir():
+                count += 1
+                shutil.copy(seed.path, "/out/seeds")
+
+    # temporary_directory = '/tmp/untar/'
+
+    # for f in os.listdir(starting_seed_corpus):
+    #     os.mkdir(temporary_directory)
+    #     print(starting_seed_corpus + "/" + f)
+    #     command = [
+    #         "tar", 
+    #         "-xvf", 
+    #         starting_seed_corpus + "/"  + f,
+    #         "-C", 
+    #         temporary_directory
+    #     ]
+    #     p = subprocess.Popen(command)
+    #     p.wait()
+    #     print(os.listdir(temporary_directory + "/corpus/default/queue/"))
+    #     for seed in os.scandir(temporary_directory + "/corpus/default/queue/"):
+    #         if(seed.is_dir()):
+    #             # os.rename(seed.path, temporary_directory + "/corpus/default/queue/" + str(count))
+    #             shutil.copy(seed.path, "/out/seeds/", follow_symlinks=False)
+    #             count += 1
+    #     shutil.rmtree(temporary_directory)
+
+    print("Len of seeds: " + str(len(os.listdir("/out/seeds/"))))
     print(count)
-    # for f in os.listdir()
 
 
 
