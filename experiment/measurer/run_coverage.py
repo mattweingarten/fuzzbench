@@ -15,6 +15,7 @@
 on a corpus."""
 
 import os
+from re import T
 import tempfile
 from typing import List
 
@@ -22,8 +23,13 @@ from common import experiment_utils
 from common import logs
 from common import new_process
 from common import sanitizer
+from common import filestore_utils
+import os
+from os import listdir
+from os.path import isfile, join
 
 logger = logs.Logger('run_coverage')
+
 
 # Time buffer for libfuzzer merge to gracefully exit.
 EXIT_BUFFER = 15
@@ -49,11 +55,96 @@ def find_crashing_units(artifacts_dir: str) -> List[str]:
     ]
 
 
+def list_files(dir):
+    files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
+    return files
+
+def get_coverage_sancov(coverage_binary, new_units_dir, trial_dir):
+    """ XXX:Bean, invoke sancov, extract edge regions covered"""
+    edge_cov = 0
+    sancov_exe = os.path.dirname(os.path.realpath(__file__)) + '/files/sancov'
+
+    try:
+        with tempfile.TemporaryDirectory() as asan_outdir:
+            
+            command = [
+                coverage_binary,
+                new_units_dir
+            ]
+            coverage_binary_dir = os.path.dirname(coverage_binary)
+            env = os.environ.copy()
+
+            data_dir = ":coverage_dir=" + asan_outdir
+            if 'ASAN_OPTIONS' in env:
+                env['ASAN_OPTIONS'] = env['ASAN_OPTIONS'] + ':coverage=1' + data_dir
+            else:
+                env['ASAN_OPTIONS'] = 'coverage=1' + data_dir
+
+            print(command)
+            result = new_process.execute(command,
+                                         env=env,
+                                         cwd=coverage_binary_dir,
+                                         expect_zero=False,
+                                         kill_children=True,
+                                         timeout=MAX_TOTAL_TIME)
+
+            if result.retcode != 0:
+                logger.error('Coverage run failed.',
+                             extras={
+                                 'coverage_binary': coverage_binary,
+                                 'output': result.output[-new_process.LOG_LIMIT_FIELD:],
+                             })
+                print(result)
+                print(result.retcode)
+                print(result.output)
+                print(coverage_binary_dir)
+                print(MAX_TOTAL_TIME)
+
+            else:
+                cov_file = None
+                for file in os.listdir(asan_outdir):
+                    if file.endswith(".sancov"):
+                        cov_file = os.path.join(asan_outdir, file)
+                        break
+
+                command = [
+                    sancov_exe,
+                    '-print',
+                    cov_file
+                ]
+
+                sancov_outfile_name =  os.path.join(asan_outdir, 'sancov_out.txt')
+                sancov_outfile = open(sancov_outfile_name, "w")
+
+                print(command)
+                result = new_process.execute(command,
+                                             env=env,
+                                             cwd=asan_outdir,
+                                             expect_zero=False,
+                                             kill_children=True,
+                                             output_file=sancov_outfile,
+                                             timeout=MAX_TOTAL_TIME)
+
+
+                sancov_outfile.close()
+                edge_cov = sum(1 for line in open(sancov_outfile.name))
+                print(coverage_binary, 'covered edges: ', edge_cov, sancov_outfile_name, cov_file)
+
+                print(trial_dir, sancov_outfile.name )
+                filestore_utils.cp(sancov_outfile.name, trial_dir + '/', parallel=True)
+
+    except Exception as e:
+        print(e)
+        pass
+    return edge_cov
+
+
 def do_coverage_run(  # pylint: disable=too-many-locals
         coverage_binary: str, new_units_dir: List[str],
-        profraw_file_pattern: str, crashes_dir: str) -> List[str]:
+        profraw_file_pattern: str, crashes_dir: str, sancov=False) -> List[str]:
     """Does a coverage run of |coverage_binary| on |new_units_dir|. Writes
     the result to |profraw_file_pattern|. Returns a list of crashing units."""
+
     with tempfile.TemporaryDirectory() as merge_dir:
         command = [
             coverage_binary, '-merge=1', '-dump_coverage=1',
@@ -81,3 +172,11 @@ def do_coverage_run(  # pylint: disable=too-many-locals
                          'output': result.output[-new_process.LOG_LIMIT_FIELD:],
                      })
     return find_crashing_units(crashes_dir)
+
+
+if __name__ == '__main__':
+    coverage_binary = '/home/b/bdata-unsync/ast-fuzz/experiment-data/exp-2022-05-28-19-20-39/coverage-binaries/fuzz_htp'
+    e = ''
+    new_units_diro0 = '/home/b/bdata-unsync/ast-fuzz/experiment-data/exp-2022-05-28-19-20-39/experiment-folders/libhtp_fuzz_htp-aflplusplus_ast_f0/trial-359/corpus/corpus/default/queue/'
+    cov = get_coverage_sancov(coverage_binary, new_units_diro0)
+    print(cov)

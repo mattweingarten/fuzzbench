@@ -41,3 +41,35 @@ docker/generated.mk
 
 # Vim backup files.
 .*.swp
+/fuzzers/coverage/libFuzzer.a
+/experiment/measurer/test_data/test_run_coverage/third_party/StandaloneFuzzTargetMain.o
+/experiment/measurer/test_data/test_run_coverage/test/
+/experiment/measurer/test_data/test_run_coverage/test.symcov
+/experiment/measurer/test_data/test_run_coverage/target2.asm
+/experiment/measurer/test_data/test_run_coverage/out
+/experiment/measurer/test_data/test_run_coverage/fuzzer.standalone.452099.sancov
+/experiment/measurer/test_data/test_run_coverage/fuzzer.standalone
+/experiment/measurer/test_data/test_run_coverage/fuzz-target2.o3.156851.sancov
+/experiment/measurer/test_data/test_run_coverage/fuzz-target2.o3.151325.sancov
+/experiment/measurer/test_data/test_run_coverage/fuzz-target2.o3.148774.sancov
+/experiment/measurer/test_data/test_run_coverage/crash-0a04b971b03da607ce6c455184037b660ca89f78
+/experiment/measurer/test_data/test_run_coverage/crash-3f786850e387550fdab836ed7e6dc881de23001b
+/experiment/measurer/test_data/test_run_coverage/crash-86f7e437faa5a7fce15d1ddcb9eaeaea377667b8
+/experiment/measurer/test_data/test_run_coverage/crash-da39a3ee5e6b4b0d3255bfef95601890afd80709
+/experiment/measurer/test_data/test_run_coverage/default.profraw
+/experiment/measurer/test_data/test_run_coverage/fuzz-target.o0.noprune
+/experiment/measurer/test_data/test_run_coverage/fuzz-target.o0.noprune.178081.sancov
+/experiment/measurer/test_data/test_run_coverage/fuzz-target.o3.noprune
+/experiment/measurer/test_data/test_run_coverage/fuzz-target.o3.noprune.178019.sancov
+/experiment/measurer/test_data/test_run_coverage/fuzz-target.src
+/experiment/measurer/test_data/test_run_coverage/fuzz-target.src.163474.sancov
+/experiment/measurer/test_data/test_run_coverage/fuzz-target.test
+/experiment/measurer/test_data/test_run_coverage/fuzz-target.test.271579.sancov
+/experiment/measurer/test_data/test_run_coverage/fuzz-target.test.271752.sancov
+/experiment/measurer/test_data/test_run_coverage/fuzz-target2
+/experiment/measurer/test_data/test_run_coverage/fuzz-target2.139189.sancov
+/experiment/measurer/test_data/test_run_coverage/fuzz-target2.o0
+/experiment/measurer/test_data/test_run_coverage/fuzz-target2.o0.151271.sancov
+/experiment/measurer/test_data/test_run_coverage/fuzz-target2.o0.156974.sancov
+/experiment/measurer/test_data/test_run_coverage/fuzz-target2.o3
+/fuzzers/coverage/sancov

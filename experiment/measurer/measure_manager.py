@@ -47,6 +47,7 @@ from experiment.measurer import coverage_utils
 from experiment.measurer import run_coverage
 from experiment.measurer import run_crashes
 from experiment import scheduler
+from experiment.measurer.run_coverage import get_coverage_sancov
 
 logger = logs.Logger('measurer')  # pylint: disable=invalid-name
 
@@ -401,6 +402,13 @@ class SnapshotMeasurer(coverage_utils.TrialCoverage):  # pylint: disable=too-man
             filesystem.recreate_directory(directory)
         filesystem.create_directory(self.report_dir)
 
+    def run_cov_new_units_sancov(self):
+        coverage_binary = coverage_utils.get_coverage_binary(self.benchmark)
+        trial_dir = experiment_utils.get_trial_bucket_dir(self.fuzzer, self.benchmark, self.trial_num)
+        cov = run_coverage.get_coverage_sancov(coverage_binary,
+                                                      self.corpus_dir, trial_dir)
+        return cov
+
     def run_cov_new_units(self):
         """Run the coverage binary on new units."""
         coverage_binary = coverage_utils.get_coverage_binary(self.benchmark)
@@ -440,6 +448,7 @@ class SnapshotMeasurer(coverage_utils.TrialCoverage):  # pylint: disable=too-man
             summary_data = coverage_data["totals"]
             regions_coverage_data = summary_data["regions"]
             regions_covered = regions_coverage_data["covered"]
+
             return regions_covered
         except Exception:  # pylint: disable=broad-except
             self.logger.error(
@@ -574,6 +583,7 @@ class SnapshotMeasurer(coverage_utils.TrialCoverage):  # pylint: disable=too-man
     def update_measured_files(self):
         """Updates the measured-files.txt file for this trial with
         files measured in this snapshot."""
+
         current_files = set(os.listdir(self.corpus_dir))
         already_measured = self.get_measured_files()
         filesystem.write(self.measured_files_path,
@@ -657,15 +667,18 @@ def measure_snapshot_coverage(  # pylint: disable=too-many-locals
     measuring_start_time = time.time()
     snapshot_logger.info('Measuring cycle: %d.', cycle)
     this_time = experiment_utils.get_cycle_time(cycle)
-    if snapshot_measurer.is_cycle_unchanged(cycle):
-        snapshot_logger.info('Cycle: %d is unchanged.', cycle)
-        regions_covered = snapshot_measurer.get_current_coverage()
-        fuzzer_stats_data = snapshot_measurer.get_fuzzer_stats(cycle)
-        return models.Snapshot(time=this_time,
-                               trial_id=trial_num,
-                               edges_covered=regions_covered,
-                               fuzzer_stats=fuzzer_stats_data,
-                               crashes=[])
+
+    # XXX: Bean we always create data for snapshot even if cycle unchanged
+
+    # if snapshot_measurer.is_cycle_unchanged(cycle):
+    #     snapshot_logger.info('Cycle: %d is unchanged.', cycle)
+    #     regions_covered = snapshot_measurer.get_current_coverage()
+    #     fuzzer_stats_data = snapshot_measurer.get_fuzzer_stats(cycle)
+    #     return models.Snapshot(time=this_time,
+    #                            trial_id=trial_num,
+    #                            edges_covered=regions_covered,
+    #                            fuzzer_stats=fuzzer_stats_data,
+    #                            crashes=[])
 
     corpus_archive_dst = os.path.join(
         snapshot_measurer.trial_dir, 'corpus',
@@ -696,17 +709,28 @@ def measure_snapshot_coverage(  # pylint: disable=too-many-locals
     # Run crashes again, parse stacktraces and generate crash signatures.
     crashes = snapshot_measurer.process_crashes(cycle)
 
-    # Get the coverage of the new corpus units.
+    # AST edge coverage
+    edges_covered = snapshot_measurer.run_cov_new_units_sancov()
+    
+
+    # Get the coverage of the new corpus units
+    # XXX: Bean We dont care about src based cov
     regions_covered = snapshot_measurer.get_current_coverage()
+
     fuzzer_stats_data = snapshot_measurer.get_fuzzer_stats(cycle)
+
+    print("new snapshot", this_time, trial_num, edges_covered, fuzzer_stats_data, crashes)
+
     snapshot = models.Snapshot(time=this_time,
                                trial_id=trial_num,
-                               edges_covered=regions_covered,
+                               edges_covered=edges_covered,
                                fuzzer_stats=fuzzer_stats_data,
                                crashes=crashes)
 
+    # XXX: Bean We always measure corpus again from new (bean)
+    # This is needed for sancov to work!
     # Record the new corpus files.
-    snapshot_measurer.update_measured_files()
+    # snapshot_measurer.update_measured_files()
 
     measuring_time = round(time.time() - measuring_start_time, 2)
     snapshot_logger.info('Measured cycle: %d in %f seconds.', cycle,
